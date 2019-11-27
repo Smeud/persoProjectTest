@@ -16,20 +16,7 @@ import logging
 from collections import OrderedDict
 import multiprocessing
 import numpy as np
-
-import pprint
-%tensorflow_version 1.x
 import tensorflow as tf
-
-if 'COLAB_TPU_ADDR' not in os.environ:
-  print('ERROR: Not connected to a TPU runtime; please see the first cell in this notebook for instructions!')
-else:
-  tpu_address = 'grpc://' + os.environ['COLAB_TPU_ADDR']
-  print ('TPU address is', tpu_address)
-
-  with tf.Session(tpu_address) as session:
-    devices = session.list_devices()
-
 import keras
 import keras.backend as K
 import keras.layers as KL
