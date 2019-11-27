@@ -11,11 +11,11 @@ ROOT_DIR = os.path.abspath("../../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
-from mrcnn.config import Config
-from mrcnn import model as modellib, utils
+from config import Config
+import model as modellib, utils
 
 # Path to trained weights file
-# COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
@@ -166,11 +166,11 @@ def train(model):
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
-    print("Training network heads")
+    print("Training network")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=100,
-                layers='all',augmentation = imgaug.augmenters.Sometimes(0.5, [
+                layers='all', augmentation = imgaug.augmenters.Sometimes(0.5, [
                     imgaug.augmenters.Fliplr(0.5),
                     imgaug.augmenters.GaussianBlur(sigma=(0.0, 5.0))
                 ]))
@@ -264,9 +264,9 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', required=False,
                         metavar="/path/to/balloon/dataset/",
                         help='Directory of the Balloon dataset')
-#     parser.add_argument('--weights', required=True,
-#                         metavar="/path/to/weights.h5",
-#                         help="Path to weights .h5 file or 'coco'")
+    parser.add_argument('--weights', required=True,
+                        metavar="/path/to/weights.h5",
+                        help="Path to weights .h5 file or 'coco'")
     parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
@@ -311,32 +311,32 @@ if __name__ == '__main__':
                                   model_dir=args.logs)
 
     # Select weights file to load
-#     if args.weights.lower() == "coco":
-#         weights_path = COCO_WEIGHTS_PATH
-#         # Download weights file
-#         if not os.path.exists(weights_path):
-#             utils.download_trained_weights(weights_path)
-#     elif args.weights.lower() == "last":
-#         # Find last trained weights
-#         weights_path = model.find_last()
-#     elif args.weights.lower() == "imagenet":
-#         # Start from ImageNet trained weights
-#         weights_path = model.get_imagenet_weights()
-#     else:
-#         weights_path = args.weights
+    if args.weights.lower() == "coco":
+        weights_path = COCO_WEIGHTS_PATH
+        # Download weights file
+        if not os.path.exists(weights_path):
+            utils.download_trained_weights(weights_path)
+    elif args.weights.lower() == "last":
+        # Find last trained weights
+        weights_path = model.find_last()
+    elif args.weights.lower() == "imagenet":
+        # Start from ImageNet trained weights
+        weights_path = model.get_imagenet_weights()
+    else:
+        weights_path = args.weights
     
     # Load weights
-#     print("Loading weights ", weights_path)
+    print("Loading weights ", weights_path)
 
-    # if False:
-    #     if args.weights.lower() == "coco":
-    #         # Exclude the last layers because they require a matching
-    #         # number of classes
-    #         model.load_weights(weights_path, by_name=True, exclude=[
-    #             "mrcnn_class_logits", "mrcnn_bbox_fc",
-    #             "mrcnn_bbox", "mrcnn_mask"])
-    #     else:
-    #         model.load_weights(weights_path, by_name=True)
+    if False:
+        if args.weights.lower() == "coco":
+            # Exclude the last layers because they require a matching
+            # number of classes
+            model.load_weights(weights_path, by_name=True, exclude=[
+                "mrcnn_class_logits", "mrcnn_bbox_fc",
+                "mrcnn_bbox", "mrcnn_mask"])
+        else:
+            model.load_weights(weights_path, by_name=True)
     # Train or evaluate
     if args.command == "train":
         train(model)
